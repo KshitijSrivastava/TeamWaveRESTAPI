@@ -9,6 +9,15 @@ Requirement: (ref: https://api.stackexchange.com/docs/advanced-search)
 4. Add Search limit per min(5) and per day(100) for each session
 
 
+- /user -> Get and post of user data
+- user/<int:pk> -> update and delete of user data
+- question/ -> Get and post of question
+- question/<int:pk> -> update and delete of questions
+- answer/ -> get and post of answers
+- answer/<int:pk> -> update and delete of answers
+- search/advanced -> searching
+
+
 - q - a free form text parameter, will match all question properties based on an
 undocumented algorithm.
 

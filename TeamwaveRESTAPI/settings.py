@@ -120,3 +120,16 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+#Django REST Framework
+
+REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_CLASSES': [
+        'RESTAPI.throttles.BurstRateThrottle',
+        'RESTAPI.throttles.SustainedRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'burst': '5/min',
+        'sustained': '100/day'
+    }
+}

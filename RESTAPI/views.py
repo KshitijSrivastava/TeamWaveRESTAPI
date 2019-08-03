@@ -5,8 +5,9 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 
 
+from RESTAPI.throttles import BurstRateThrottle, SustainedRateThrottle
 from RESTAPI.models import UserData, Question, Answer
-from RESTAPI.serializers import AnswerSerializer, QuestionSerializer, UserSerializer
+from RESTAPI.serializers import AnswerSerializer, QuestionSerializer, UserSerializer, QuerySerializer
 # Create your views here.
 
 class StandardResultsPagination(PageNumberPagination):
@@ -41,7 +42,9 @@ class AnswerDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class Search(generics.ListAPIView):
     pagination_class = StandardResultsPagination
-    serializer_class = QuestionSerializer
+    serializer_class = QuerySerializer
+    throttle_classes = [BurstRateThrottle, SustainedRateThrottle]
+
 
     def get_queryset(self):
         return Question.objects.all()
@@ -49,22 +52,22 @@ class Search(generics.ListAPIView):
     def filter_queryset(self, queryset):
 
         queryset = self.get_queryset()
-        for ques in queryset:
-            print(ques.question_user)
-        print('params', self.request.query_params)
+        params = self.request.query_params
+
+        filters_query = {}
+        if 'id' in params:
+            filters_query['id'] = int(params['id'])
+        if 'title' in params:
+            filters_query['title'] = params['title']
+        # if 'accepted' in params:
+        #     filters_query['accepted'] = params['accepted']
+
+        queryset = queryset.filter(**filters_query)
         return queryset
 
-    # def get_object(self):
-    #     queryset = self.get_queryset()
-    #     filter = {}
-    #     for field in self.multiple_lookup_fields:
-    #         filter[field] = self.kwargs[field]
-    #
-    #     print('filter', filter)
-    #     print('kwargs', self.kwargs)
-    #     print('querry param', self.request.query_params)
-    #     return queryset
-
+    #@method_decorator(cache_page(60*60*2))
+    # def get(self, request, format=None):
+    #     super().get(self, request, format = None)
 
 def home(request):
     return HttpResponse('Welcome to REST API')
